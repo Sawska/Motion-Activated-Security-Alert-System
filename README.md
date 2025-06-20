@@ -23,6 +23,10 @@ A simple embedded project using **Arduino Uno** and **ESP32**, designed to trigg
   * Delay and reset logic
   * (Bonus) IR Remote to enable/disable system
 
+
+
+
+
 ---
 
 ## 📋 Description
@@ -46,6 +50,11 @@ When motion or proximity is detected (closer than 24 cm), the **buzzer sounds** 
 ### 📸 Real Hardware Setup
 
 ![Real hardware setup](https://github.com/user-attachments/assets/833fa088-cad5-470f-aed1-62f327abf71a)
+
+---
+
+### 📸 Video
+https://github.com/user-attachments/assets/40860d75-fea5-45b0-9868-64e44c2d4465
 
 ---
 
