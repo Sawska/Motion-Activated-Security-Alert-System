@@ -128,6 +128,89 @@ void loop() {
 
 ---
 
+### Adding IR remote
+
+#### Circuit Diagram
+
+<img width="564" alt="Screenshot 2025-06-21 at 18 32 15" src="https://github.com/user-attachments/assets/8effba2d-ff74-4cc3-822c-c4a3a8ed0ef4" />
+
+#### code
+
+due to innability to add IrReceiver library that turns IR receiver into button or switch, i just checked weither IR receiver gets any signal at all
+
+```cpp
+const int buzzerPin = 12;
+const int echoPin = 10;
+const int trigPin = 9;
+const int ledPin = 11;
+const int irSensorPin = 2;
+
+const int alarmThreshold = 24;
+
+long duration;
+int distance;
+unsigned long irLastDetected = 0;
+const unsigned long irDisableDuration = 5000;
+unsigned long lastBlinkTime = 0;
+bool ledState = false;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(irSensorPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  
+  if (digitalRead(irSensorPin) == LOW) {
+    irLastDetected = millis();
+    Serial.println("IR signal detected!");
+  }
+
+  
+  bool irBlockingActive = millis() - irLastDetected < irDisableDuration;
+
+  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH, 30000);
+  distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  
+  if (distance > 0 && distance < alarmThreshold && !irBlockingActive) {
+    
+    if (millis() - lastBlinkTime >= 250) {
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+      if (ledState)
+        tone(buzzerPin, 1000);
+      else
+        noTone(buzzerPin);
+      lastBlinkTime = millis();
+    }
+  } else {
+    digitalWrite(ledPin, LOW);
+    noTone(buzzerPin);
+  }
+
+  
+  delay(5);
+}
+
+```
+
+
+
 ## 🧩 TODO / Extensions
 
 * [ ] Add IR remote to enable/disable the system.
