@@ -209,11 +209,14 @@ void loop() {
 
 ```
 
+#### 📸 Real Hardware Setup
+
+![image](https://github.com/user-attachments/assets/ef1b3bc7-2d90-47e1-af58-056bf9dcd3d8)
 
 
 ## 🧩 TODO / Extensions
 
-* [ ] Add IR remote to enable/disable the system.
+* [x] Add IR remote to enable/disable the system.
 * [ ] Replace distance sensor with PIR motion sensor (HC-SR501).
 * [ ] Upload version for ESP32.
 * [ ] Add notification or logging feature (e.g., via Wi-Fi with ESP32).
