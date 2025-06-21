@@ -23,6 +23,10 @@ A simple embedded project using **Arduino Uno** and **ESP32**, designed to trigg
   * Delay and reset logic
   * (Bonus) IR Remote to enable/disable system
 
+
+
+
+
 ---
 
 ## 📋 Description
@@ -46,6 +50,11 @@ When motion or proximity is detected (closer than 24 cm), the **buzzer sounds** 
 ### 📸 Real Hardware Setup
 
 ![Real hardware setup](https://github.com/user-attachments/assets/833fa088-cad5-470f-aed1-62f327abf71a)
+
+---
+
+### 📸 Video
+https://github.com/user-attachments/assets/40860d75-fea5-45b0-9868-64e44c2d4465
 
 ---
 
@@ -119,9 +128,95 @@ void loop() {
 
 ---
 
+### Adding IR remote
+
+#### Circuit Diagram
+
+<img width="564" alt="Screenshot 2025-06-21 at 18 32 15" src="https://github.com/user-attachments/assets/8effba2d-ff74-4cc3-822c-c4a3a8ed0ef4" />
+
+#### code
+
+due to innability to add IrReceiver library that turns IR receiver into button or switch, i just checked weither IR receiver gets any signal at all
+
+```cpp
+const int buzzerPin = 12;
+const int echoPin = 10;
+const int trigPin = 9;
+const int ledPin = 11;
+const int irSensorPin = 2;
+
+const int alarmThreshold = 24;
+
+long duration;
+int distance;
+unsigned long irLastDetected = 0;
+const unsigned long irDisableDuration = 5000;
+unsigned long lastBlinkTime = 0;
+bool ledState = false;
+
+void setup() {
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(ledPin, OUTPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(irSensorPin, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  
+  if (digitalRead(irSensorPin) == LOW) {
+    irLastDetected = millis();
+    Serial.println("IR signal detected!");
+  }
+
+  
+  bool irBlockingActive = millis() - irLastDetected < irDisableDuration;
+
+  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH, 30000);
+  distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  
+  if (distance > 0 && distance < alarmThreshold && !irBlockingActive) {
+    
+    if (millis() - lastBlinkTime >= 250) {
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+      if (ledState)
+        tone(buzzerPin, 1000);
+      else
+        noTone(buzzerPin);
+      lastBlinkTime = millis();
+    }
+  } else {
+    digitalWrite(ledPin, LOW);
+    noTone(buzzerPin);
+  }
+
+  
+  delay(5);
+}
+
+```
+
+#### 📸 Real Hardware Setup
+
+![image](https://github.com/user-attachments/assets/ef1b3bc7-2d90-47e1-af58-056bf9dcd3d8)
+
+
 ## 🧩 TODO / Extensions
 
-* [ ] Add IR remote to enable/disable the system.
+* [x] Add IR remote to enable/disable the system.
 * [ ] Replace distance sensor with PIR motion sensor (HC-SR501).
 * [ ] Upload version for ESP32.
 * [ ] Add notification or logging feature (e.g., via Wi-Fi with ESP32).
